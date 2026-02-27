@@ -1,0 +1,30 @@
+name: Bot PR Signal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update signal file
+        run: |
+          mkdir -p signals
+          echo "signal generated at $(date -u +%Y-%m-%dT%H:%M:%SZ)" > signals/review-signal.txt
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update review signal"
+          title: "chore: update review signal"
+          body: "Automated PR to provide a review target for contribution tracking."
+          branch: "bot/review-signal"
+          delete-branch: true
